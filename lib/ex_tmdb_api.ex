@@ -25,4 +25,8 @@ defmodule ExTmdbApi do
     |> UriTemplate.expand(params)
     |> make_request(params, options)
   end
+
+  def image_url(base_url, size, path) do
+    "#{base_url}#{size}#{path}"
+  end
 end
