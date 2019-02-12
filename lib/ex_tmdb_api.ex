@@ -1,18 +1,28 @@
 defmodule ExTmdbApi do
-  @moduledoc """
-  Documentation for ExTmdbApi.
-  """
+  use HTTPoison.Base
 
-  @doc """
-  Hello world.
+  def process_url(endpoint) do
+    "https://api.themoviedb.org/" <> endpoint
+  end
 
-  ## Examples
+  def process_response_body(body) do
+    JSX.decode!(body)
+  end
 
-      iex> ExTmdbApi.hello()
-      :world
+  def make_request(endpoint, params \\ [], options \\ []) do
+    params = params ++ [api_key: api_key()]
+    query_params = "?" <> URI.encode_query(params)
+    get!(endpoint <> query_params, [], options)
+  end
 
-  """
-  def hello do
-    :world
+  def api_key do
+    Application.get_env(:ex_tmdb_api, :api_key) ||
+      System.get_env("TMDB_API_KEY")
+  end
+
+  def expand_and_make_request(path, params \\ [], options \\ []) do
+    path
+    |> UriTemplate.expand(params)
+    |> make_request(params, options)
   end
 end
